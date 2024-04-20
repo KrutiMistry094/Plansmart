@@ -10,8 +10,11 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useTheme } from "./theme"; // Import useTheme hook from your theme file
 
 export default function HomeScreen() {
+  const { theme } = useTheme(); // Get current theme
+
   const [tasks, setTasks] = useState([]);
   const [text, setText] = useState("");
   const [deletingTaskId, setDeletingTaskId] = useState(null);
@@ -47,26 +50,62 @@ export default function HomeScreen() {
     const isDeleting = deletingTaskId === item.task_id;
     return (
       <TouchableOpacity onPress={() => clickHandler(item.task_id)}>
-        <View style={styles.itemLeft}></View>
-        <Text style={[styles.addTask, isDeleting ? styles.deletingTask : null]}>
-          <View>
-            <View style={styles.circular}></View>
-          </View>
-          {item.task_name}
-        </Text>
+        <View
+          style={[
+            styles.addTask,
+            { backgroundColor: theme === "dark" ? "#333" : "#FFF" },
+            isDeleting ? styles.deletingTask : null,
+          ]}
+        >
+          <View style={styles.itemLeft}></View>
+          <Text
+            style={[
+              styles.taskText,
+              { color: theme === "dark" ? "#FFF" : "#333" },
+            ]}
+          >
+            <View
+              style={[
+                styles.circular,
+                { borderColor: theme === "dark" ? "#FFF" : "#55BCF6" },
+              ]}
+            ></View>
+            {item.task_name}
+          </Text>
+        </View>
       </TouchableOpacity>
     );
   };
 
   return (
-    <View>
-      <Text>Today's Tasks</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme === "dark" ? "#222" : "#FFF" },
+      ]}
+    >
+      <Text
+        style={[styles.title, { color: theme === "dark" ? "#FFF" : "#333" }]}
+      >
+        Today's Tasks
+      </Text>
       <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: theme === "dark" ? "#444" : "#EEE",
+            color: theme === "dark" ? "#FFF" : "#333",
+          },
+        ]}
         placeholder="Enter Task"
         onChangeText={changeHandler}
         value={text}
       />
-      <Button title="Add" onPress={submitHandler} />
+      <Button
+        title="Add"
+        onPress={submitHandler}
+        color={theme === "dark" ? "#007bff" : "#007bff"}
+      />
       <FlatList
         keyboardShouldPersistTaps="handled"
         keyExtractor={(item) => item.task_id.toString()} // Ensure task_id is a string
@@ -78,8 +117,24 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
   addTask: {
-    backgroundColor: "#FFF",
     padding: 20,
     borderRadius: 10,
     flexDirection: "row",
@@ -91,6 +146,9 @@ const styles = StyleSheet.create({
   deletingTask: {
     backgroundColor: "#9FD4A3",
   },
+  taskText: {
+    fontSize: 16,
+  },
   itemLeft: {
     flexDirection: "row",
     alignItems: "center",
@@ -99,11 +157,9 @@ const styles = StyleSheet.create({
   circular: {
     width: 12,
     height: 12,
-    borderColor: "#55BCF6",
     borderWidth: 2,
     borderRadius: 5,
     padding: 5,
-    justifyContent: "space-around",
     marginRight: 10,
   },
 });

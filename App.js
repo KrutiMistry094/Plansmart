@@ -1,8 +1,7 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { ThemeProvider } from "./screens/theme.js";
 import HomeScreen from "./screens/HomeScreen";
 import CalendarScreen from "./screens/CalendarScreen";
 import ReminderScreen from "./screens/ReminderScreen.js";
@@ -15,55 +14,50 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer
-      screenOption={{
-        tabBarLabelPosition: "below-icon",
-        tabBarShowLabel: false,
-      }}
-    >
-      <Tab.Navigator>
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            tabBarLabel: "",
-            tabBarIcon: () => <FontAwesome name="home" size={22} />,
+    <ThemeProvider>
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={{
+            tabBarLabelPosition: "below-icon",
+            tabBarShowLabel: false,
           }}
-        />
-        <Tab.Screen
-          name="Calendar"
-          component={CalendarScreen}
-          options={{
-            tabBarLabel: "",
-            tabBarIcon: () => <FontAwesome6 name="calendar-check" size={22} />,
-          }}
-        />
-        <Tab.Screen
-          name="Reminder"
-          component={ReminderScreen}
-          options={{
-            tabBarLabel: "",
-            tabBarIcon: () => <FontAwesome name="bell" size={22} />,
-          }}
-        />
-        <Tab.Screen
-          name="Settings"
-          component={SettingScreen}
-          options={{
-            tabBarLabel: "",
-            tabBarIcon: () => <Ionicons name="settings-sharp" size={22} />,
-          }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
+        >
+          <Tab.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{
+              tabBarLabel: "",
+              tabBarIcon: () => <FontAwesome name="home" size={22} />,
+            }}
+          />
+          <Tab.Screen
+            name="Calendar"
+            component={CalendarScreen}
+            options={{
+              tabBarLabel: "",
+              tabBarIcon: () => (
+                <FontAwesome6 name="calendar-check" size={22} />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="Reminder"
+            component={ReminderScreen}
+            options={{
+              tabBarLabel: "",
+              tabBarIcon: () => <FontAwesome name="bell" size={22} />,
+            }}
+          />
+          <Tab.Screen
+            name="Settings"
+            component={SettingScreen}
+            options={{
+              tabBarLabel: "",
+              tabBarIcon: () => <Ionicons name="settings-sharp" size={22} />,
+            }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

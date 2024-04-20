@@ -1,9 +1,17 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { useTheme } from "./theme";
 
 export default function SettingsScreen() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme === "dark" ? "#333" : "#fff" },
+      ]}
+    >
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
         {/* Add account-related settings here */}
@@ -14,7 +22,13 @@ export default function SettingsScreen() {
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Theme</Text>
-        {/* Add theme selection here */}
+        <TouchableOpacity style={styles.themeOption} onPress={toggleTheme}>
+          <Text style={styles.themeText}>
+            {theme === "dark"
+              ? "Switch to Light Theme"
+              : "Switch to Dark Theme"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -24,10 +38,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f0f0f0", // Background color
   },
   section: {
-    backgroundColor: "#ffffff", // Section background color
+    backgroundColor: "#ffffff",
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
@@ -44,5 +57,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  themeOption: {
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 10,
+  },
+  themeText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
   },
 });

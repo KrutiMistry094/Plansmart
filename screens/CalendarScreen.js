@@ -1,207 +1,244 @@
 import React, { useState } from "react";
 import {
   StyleSheet,
-  Text,
   View,
+  Text,
   TouchableOpacity,
-  FlatList,
+  TextInput,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons"; // Import AntDesign for arrow keys
+import { AntDesign } from "@expo/vector-icons";
+import { useTheme } from "./theme.js"; // Import useTheme hook
 
 const CalendarScreen = () => {
+  const { theme } = useTheme(); // Get the current theme using useTheme hook
+
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    { name: "January", days: 31 },
+    { name: "February", days: 28 }, // Adjust for leap years
+    { name: "March", days: 31 },
+    { name: "April", days: 30 },
+    { name: "May", days: 31 },
+    { name: "June", days: 30 },
+    { name: "July", days: 31 },
+    { name: "August", days: 31 },
+    { name: "September", days: 30 },
+    { name: "October", days: 31 },
+    { name: "November", days: 30 },
+    { name: "December", days: 31 },
   ];
 
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Default to current month
-  const [showOptions, setShowOptions] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("This Week");
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedMonthIndex, setSelectedMonthIndex] = useState(
+    new Date().getMonth()
+  );
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [taskText, setTaskText] = useState("");
+  const [tasks, setTasks] = useState([]);
 
-  // Function to change month
+  const handleDatePress = (date) => {
+    setSelectedDate(date);
+  };
+
+  const handleAddTask = () => {
+    if (taskText.trim() === "") {
+      alert("Please enter a task.");
+      return;
+    }
+
+    const newTask = { id: Date.now(), date: selectedDate, task: taskText };
+    setTasks([...tasks, newTask]);
+    setTaskText("");
+    setSelectedDate(null);
+  };
+
+  const handleDeleteTask = (id) => {
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+  };
+
   const changeMonth = (increment) => {
-    setSelectedMonth((prevMonth) => {
+    setSelectedMonthIndex((prevMonth) => {
       let newMonth = prevMonth + increment;
-      if (newMonth < 1)
-        newMonth = 12; // If December, go to January of next year
-      else if (newMonth > 12) newMonth = 1; // If January, go to December of previous year
+      if (newMonth < 0) {
+        newMonth = 11; // If January, go to December of previous year
+        setSelectedYear((prevYear) => prevYear - 1);
+      } else if (newMonth > 11) {
+        newMonth = 0; // If December, go to January of next year
+        setSelectedYear((prevYear) => prevYear + 1);
+      }
       return newMonth;
     });
   };
 
-  // Function to handle selecting option
-  const handleSelectOption = (option) => {
-    setSelectedOption(option);
-    setShowOptions(false);
-    // Reset selected day when option changes
-    setSelectedDay(null);
-  };
+  const currentMonth = months[selectedMonthIndex];
 
-  // Function to handle selecting a day
-  const handleSelectDay = (day) => {
-    setSelectedDay(day);
-    // Logic to display tasks for the selected day
-  };
-
-  // Function to start creating task
-  const handleCreateTask = () => {
-    // Logic to navigate to task creation screen with selected option and day
-  };
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme === "dark" ? "#333" : "#fff", // Apply theme-based background color
+    },
+    calendarWrapper: {
+      flex: 0.5, // Adjusted height
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    calendarContainer: {
+      width: "80%",
+      borderRadius: 10,
+      overflow: "hidden",
+      backgroundColor: theme === "dark" ? "#444" : "#fff", // Apply theme-based background color
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      backgroundColor: theme === "dark" ? "#222" : "#55a7f0", // Apply theme-based background color
+    },
+    monthText: {
+      fontSize: 18,
+      color: theme === "dark" ? "#fff" : "#000", // Apply theme-based text color
+    },
+    calendar: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+    },
+    dateButton: {
+      width: "14.28%", // 7 days in a week, so 100% / 7 = 14.28%
+      aspectRatio: 1, // Ensure each date button is a square
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: theme === "dark" ? "#555" : "#fff", // Apply theme-based border color
+    },
+    selectedDate: {
+      backgroundColor: theme === "dark" ? "#555" : "#55a7f0", // Apply theme-based background color
+    },
+    dateText: {
+      color: theme === "dark" ? "#fff" : "#000", // Apply theme-based text color
+      fontSize: 16,
+    },
+    taskInputContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 20,
+      marginBottom: 10,
+    },
+    taskInput: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: theme === "dark" ? "#555" : "#ccc", // Apply theme-based border color
+      borderRadius: 5,
+      padding: 10,
+      fontStyle: "italic",
+      color: theme === "dark" ? "#fff" : "#55a7f0", // Apply theme-based text color
+    },
+    addButton: {
+      backgroundColor: theme === "dark" ? "#555" : "#55a7f0", // Apply theme-based background color
+      padding: 10,
+      borderRadius: 5,
+      marginLeft: 10,
+    },
+    addButtonText: {
+      color: theme === "dark" ? "#fff" : "#fff", // Apply theme-based text color
+      fontWeight: "bold",
+    },
+    taskList: {
+      paddingHorizontal: 20,
+    },
+    taskListTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 10,
+      color: theme === "dark" ? "#fff" : "#000", // Apply theme-based text color
+    },
+    taskItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 10,
+    },
+    taskText: {
+      flex: 1,
+      fontSize: 16,
+      fontStyle: "italic",
+      color: theme === "dark" ? "#fff" : "#55a7f0", // Apply theme-based text color
+    },
+    deleteButton: {},
+  });
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => changeMonth(-1)}>
-          <AntDesign name="left" size={24} />
-        </TouchableOpacity>
-        <Text style={styles.monthText}>{months[selectedMonth - 1]}</Text>
-        <TouchableOpacity onPress={() => changeMonth(1)}>
-          <AntDesign name="right" size={24} />
-        </TouchableOpacity>
+      <View style={styles.calendarWrapper}>
+        <View style={styles.calendarContainer}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => changeMonth(-1)}>
+              <AntDesign
+                name="left"
+                size={24}
+                color={theme === "dark" ? "#fff" : "#fff"}
+              />
+            </TouchableOpacity>
+            <Text style={styles.monthText}>
+              {currentMonth.name} {selectedYear}
+            </Text>
+            <TouchableOpacity onPress={() => changeMonth(1)}>
+              <AntDesign
+                name="right"
+                size={24}
+                color={theme === "dark" ? "#fff" : "#fff"}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.calendar}>
+            {[...Array(currentMonth.days)].map((_, index) => {
+              const date = index + 1;
+              return (
+                <TouchableOpacity
+                  key={date}
+                  style={[
+                    styles.dateButton,
+                    date === selectedDate ? styles.selectedDate : null,
+                  ]}
+                  onPress={() => handleDatePress(date)}
+                >
+                  <Text style={styles.dateText}>{date}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
       </View>
-      {/* Sidebar Icon */}
-      <TouchableOpacity
-        onPress={() => setShowOptions(!showOptions)}
-        style={styles.sidebarIcon}
-      >
-        <AntDesign name="menu-fold" size={24} color="black" />
-      </TouchableOpacity>
-      {/* Dropdown-like Options */}
-      {showOptions && (
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            onPress={() => handleSelectOption("This Week")}
-            style={styles.optionItem}
-          >
-            <Text style={styles.optionText}>This Week</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleSelectOption("Next Week")}
-            style={styles.optionItem}
-          >
-            <Text style={styles.optionText}>Next Week</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleSelectOption("This Month")}
-            style={styles.optionItem}
-          >
-            <Text style={styles.optionText}>This Month</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleSelectOption("Today")}
-            style={styles.optionItem}
-          >
-            <Text style={styles.optionText}>Today</Text>
+      {selectedDate && (
+        <View style={styles.taskInputContainer}>
+          <TextInput
+            style={styles.taskInput}
+            value={taskText}
+            onChangeText={setTaskText}
+            placeholder="Enter task"
+          />
+          <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
+            <Text style={styles.addButtonText}>Add Task</Text>
           </TouchableOpacity>
         </View>
       )}
-      {/* Display Selected Option */}
-      <View style={styles.selectedOptionContainer}>
-        <Text style={styles.selectedOptionText}>{selectedOption}</Text>
-        {selectedDay && (
-          <Text style={styles.selectedOptionText}>
-            Selected Day: {selectedDay}
-          </Text>
-        )}
+      <View style={styles.taskList}>
+        <Text style={styles.taskListTitle}>Select a date to enter tasks:</Text>
+        {tasks.map((task) => (
+          <View key={task.id} style={styles.taskItem}>
+            <Text style={styles.taskText}>⬛️ {task.task}</Text>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteTask(task.id)}
+            >
+              <AntDesign name="delete" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+        ))}
       </View>
-      {/* Start Creating Task Button */}
-      <TouchableOpacity
-        onPress={handleCreateTask}
-        style={styles.createTaskButton}
-      >
-        <Text style={styles.createTaskButtonText}>Start Creating Task</Text>
-      </TouchableOpacity>
-      {/* Calendar Tasks */}
-      {/* Include your FlatList or other components here for displaying tasks */}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  monthText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  sidebarIcon: {
-    position: "absolute",
-    top: 120,
-    left: 20,
-    zIndex: 1,
-  },
-  optionsContainer: {
-    position: "absolute",
-    top: 170,
-    left: 20,
-    zIndex: 1,
-    backgroundColor: "white",
-    borderRadius: 20,
-    borderWidth: 1,
-    shadow: xxl,
-    borderColor: "rgba(0, 0, 0, 0.1)",
-    padding: 10,
-    shadowColor: "#000",
-
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  optionItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  optionText: {
-    fontSize: 16,
-  },
-  selectedOptionContainer: {
-    position: "absolute",
-    top: 100,
-    left: 20,
-    zIndex: 1,
-  },
-  selectedOptionText: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  createTaskButton: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    zIndex: 1,
-    backgroundColor: "#007AFF",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  createTaskButtonText: {
-    color: "white",
-    fontSize: 16,
-  },
-});
 
 export default CalendarScreen;
