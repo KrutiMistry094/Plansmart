@@ -14,11 +14,27 @@ export default function SettingsScreen() {
     >
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
-        {/* Add account-related settings here */}
+        <TouchableOpacity style={styles.settingOption}>
+          <Text style={styles.settingText}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.settingOption}>
+          <Text style={styles.settingText}>Change Password</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.settingOption}>
+          <Text style={styles.settingText}>Privacy Settings</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notification Settings</Text>
-        {/* Add notification settings here */}
+        <TouchableOpacity style={styles.settingOption}>
+          <Text style={styles.settingText}>Push Notifications</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.settingOption}>
+          <Text style={styles.settingText}>Email Notifications</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.settingOption}>
+          <Text style={styles.settingText}>Notification Sound</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Theme</Text>
@@ -57,6 +73,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  settingOption: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  settingText: {
+    fontSize: 16,
+    color: "#333",
   },
   themeOption: {
     padding: 10,

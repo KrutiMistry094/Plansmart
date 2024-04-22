@@ -6,18 +6,36 @@ import {
   TouchableOpacity,
   TextInput,
   FlatList,
-  Button,
+  Platform,
 } from "react-native";
+import { useTheme } from "./theme";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import PushNotification from "react-native-push-notification";
 
 const ReminderScreen = () => {
   const [reminderText, setReminderText] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [reminderNotes, setNotes] = useState("");
   const [reminders, setReminders] = useState([]);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const { theme } = useTheme(); // Accessing theme from the context
+
+  const handleConfirmDate = (date) => {
+    setSelectedDate(date.toISOString());
+    hideDatePicker();
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
 
   const handleCreateReminder = () => {
-    if (reminderText.trim() === "") {
-      alert("Please enter a reminder text.");
+    if (reminderText.trim() === "" || selectedDate.trim() === "") {
+      alert("Please enter a reminder text and select a date.");
       return;
     }
     const newReminder = {
@@ -27,39 +45,108 @@ const ReminderScreen = () => {
       note: reminderNotes,
     };
     setReminders((prevReminders) => [...prevReminders, newReminder]);
+    scheduleNotification(newReminder);
     setReminderText("");
     setSelectedDate("");
     setNotes("");
+  };
+
+  const scheduleNotification = (reminder) => {
+    const fireDate = new Date(selectedDate).getTime();
+    if (fireDate < Date.now()) {
+      alert("Please select a future date for the reminder.");
+      return;
+    }
+
+    PushNotification.localNotificationSchedule({
+      title: "Reminder",
+      message: reminder.text,
+      date: new Date(fireDate),
+      channelId: "reminders",
+      userInfo: { id: reminder.id },
+    });
   };
 
   const handleDeleteReminder = (id) => {
     setReminders((prevReminders) =>
       prevReminders.filter((reminder) => reminder.id !== id)
     );
+    PushNotification.cancelLocalNotifications({ id: id.toString() });
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Reminders</Text>
-      <Text style={styles.subtitle}>Don't forget: You've got this!</Text>
-      <View style={styles.horizontalRule} />
-      <View style={styles.reminderForm}>
-        <Text style={styles.label}>Create a new reminder:</Text>
-        <View style={styles.horizontalRule} />
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme === "dark" ? "#333" : "#FFF" },
+      ]}
+    >
+      <Text
+        style={[
+          styles.sectionTitle,
+          { color: theme === "dark" ? "#FFF" : "#333" },
+        ]}
+      >
+        Reminders
+      </Text>
+      <Text
+        style={[styles.subtitle, { color: theme === "dark" ? "#FFF" : "#333" }]}
+      >
+        Don't forget: You've got this!
+      </Text>
+      <View
+        style={[
+          styles.horizontalRule,
+          { color: theme === "dark" ? "#FFF" : "#333" },
+        ]}
+      />
+      <View
+        style={[
+          styles.reminderForm,
+          { color: theme === "dark" ? "#FFF" : "#333" },
+        ]}
+      >
+        <Text
+          style={[styles.label, { color: theme === "dark" ? "#FFF" : "#333" }]}
+        >
+          Create a new reminder:
+        </Text>
+        <View
+          style={[
+            styles.horizontalRule,
+            { color: theme === "dark" ? "#FFF" : "#333" },
+          ]}
+        />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme === "dark" ? "#444" : "#EEE",
+              color: theme === "dark" ? "#FFF" : "#333",
+            },
+          ]}
           value={reminderText}
           onChangeText={setReminderText}
           placeholder="Add a new reminder..."
         />
-        <TextInput
-          style={[styles.input]}
-          value={selectedDate}
-          onChangeText={setSelectedDate}
-          placeholder="Enter deadline..."
+        <TouchableOpacity style={styles.input} onPress={showDatePicker}>
+          <Text>{selectedDate ? selectedDate : "Select deadline..."}</Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="datetime"
+          onConfirm={handleConfirmDate}
+          onCancel={hideDatePicker}
         />
         <TextInput
-          style={[styles.input, { marginBottom: 10 }]}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme === "dark" ? "#444" : "#EEE",
+              color: theme === "dark" ? "#FFF" : "#333",
+            },
+            { marginBottom: 10 },
+          ]}
           value={reminderNotes}
           onChangeText={setNotes}
           placeholder="Add notes..."
@@ -68,10 +155,21 @@ const ReminderScreen = () => {
           style={[styles.createButton, { backgroundColor: "#55a7f0" }]}
           onPress={handleCreateReminder}
         >
-          <Text style={styles.buttonText}>Create reminder</Text>
+          <Text
+            style={[
+              styles.buttonText,
+              { color: theme === "dark" ? "#FFF" : "#333" },
+            ]}
+          >
+            Create reminder
+          </Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.header}>Upcoming</Text>
+      <Text
+        style={[styles.header, { color: theme === "dark" ? "#FFF" : "#333" }]}
+      >
+        Upcoming
+      </Text>
       <View style={styles.horizontalRule} />
       <FlatList
         data={reminders}
@@ -79,15 +177,43 @@ const ReminderScreen = () => {
         renderItem={({ item }) => (
           <View style={styles.reminderItem}>
             <View style={styles.reminderInfo}>
-              <Text style={styles.reminderHeader}>{item.text}</Text>
-              <Text style={styles.reminderDetails}>Due: {item.date}</Text>
-              <Text style={styles.reminderDetails}>Note: {item.note}</Text>
+              <Text
+                style={[
+                  styles.reminderHeader,
+                  { color: theme === "dark" ? "#FFF" : "#333" },
+                ]}
+              >
+                {item.text}
+              </Text>
+              <Text
+                style={[
+                  styles.reminderDetails,
+                  { color: theme === "dark" ? "#FFF" : "#333" },
+                ]}
+              >
+                Due: {item.date}
+              </Text>
+              <Text
+                style={[
+                  styles.reminderDetails,
+                  { color: theme === "dark" ? "#FFF" : "#333" },
+                ]}
+              >
+                Note: {item.note}
+              </Text>
             </View>
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => handleDeleteReminder(item.id)}
             >
-              <Text style={styles.deleteButtonText}>X</Text>
+              <Text
+                style={[
+                  styles.deleteButtonText,
+                  { color: theme === "dark" ? "#FFF" : "#333" },
+                ]}
+              >
+                X
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -111,25 +237,14 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     borderRadius: 5,
     backgroundColor: "#fff",
-    paddingBottom: 5,
-    fontSize: 14,
-  },
-  buttonContainer: {
-    flexDirection: "row",
+    padding: 10,
     marginBottom: 10,
   },
-  button: {
-    flex: 1,
-    paddingVertical: 15,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   createButton: {
+    backgroundColor: "#55a7f0",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
-    justifyContent: "center",
   },
   buttonText: {
     color: "white",
@@ -151,21 +266,14 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  reminderInfo: {
-    flex: 2,
-    flexDirection: "column",
-    marginVertical: 10,
-  },
   reminderItem: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "transparent",
     borderRadius: 5,
     backgroundColor: "#ffffff",
-    paddingLeft: 10,
-    marginBottom: 15,
+    padding: 10,
+    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -178,20 +286,16 @@ const styles = StyleSheet.create({
   reminderHeader: {
     fontSize: 18,
     fontWeight: "500",
-    paddingLeft: 10,
   },
   reminderDetails: {
     fontSize: 14,
-    paddingLeft: 10,
   },
   deleteButton: {
     backgroundColor: "#B90E0A",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    padding: 10,
     borderRadius: 20,
     alignSelf: "center",
-    marginRight: 20,
-    marginVertical: 20,
+    marginLeft: 10,
   },
   deleteButtonText: {
     color: "white",
@@ -200,10 +304,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: "bold",
+    marginBottom: 10,
   },
   subtitle: {
     fontSize: 18,
-    paddingBottom: 10,
+    marginBottom: 10,
   },
   header: {
     fontSize: 18,
