@@ -1,16 +1,17 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   TextInput,
   View,
-  ScrollView,
+  SafeAreaView,
   FlatList,
   TouchableOpacity,
   Button,
+  Image,
 } from "react-native";
-import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useTheme } from "./theme"; // Import useTheme hook from your theme file
+import { useTheme } from "./theme";
 
 export default function HomeScreen() {
   const { theme } = useTheme(); // Get current theme
@@ -52,57 +53,71 @@ export default function HomeScreen() {
       <TouchableOpacity onPress={() => clickHandler(item.task_id)}>
         <View
           style={[
-            styles.addTask,
-            { backgroundColor: theme === "dark" ? "#333" : "#FFF" },
+            styles.taskItem,
+            { backgroundColor: theme === "dark" ? "#444" : "#FFF" },
             isDeleting ? styles.deletingTask : null,
           ]}
         >
-          <View style={styles.itemLeft}></View>
-          <Text
-            style={[
-              styles.taskText,
-              { color: theme === "dark" ? "#FFF" : "#333" },
-            ]}
-          >
+          <View style={styles.itemLeft}>
             <View
               style={[
                 styles.circular,
                 { borderColor: theme === "dark" ? "#FFF" : "#55BCF6" },
               ]}
             ></View>
-            {item.task_name}
-          </Text>
+            <Text
+              style={[
+                styles.taskText,
+                { color: theme === "dark" ? "#FFF" : "#333" },
+              ]}
+            >
+              {item.task_name}
+            </Text>
+          </View>
+          <AntDesign name="delete" size={24} color="red" />
         </View>
       </TouchableOpacity>
     );
   };
 
   return (
-    <View
+    <SafeAreaView
       style={[
         styles.container,
         { backgroundColor: theme === "dark" ? "#222" : "#FFF" },
       ]}
     >
+      <Image
+        source={require("./study_planner_logo.jpeg")}
+        style={styles.logo}
+      />
       <Text
-        style={[styles.title, { color: theme === "dark" ? "#FFF" : "#333" }]}
+        style={[
+          styles.welcomeText,
+          { color: theme === "dark" ? "#FFF" : "#333" },
+        ]}
       >
-        Today's Tasks
+        Welcome to PlanSmart
+      </Text>
+      <Text
+        style={[styles.subtitle, { color: theme === "dark" ? "#FFF" : "#333" }]}
+      >
+        Your personal study assistant
       </Text>
       <TextInput
         style={[
           styles.input,
           {
-            backgroundColor: theme === "dark" ? "#444" : "#EEE",
-            color: theme === "dark" ? "#FFF" : "#333",
+            backgroundColor: theme === "dark" ? "white" : "#EEE",
+            color: theme === "dark" ? "white" : "#333",
           },
         ]}
-        placeholder="Enter Task"
+        placeholder="Let's plan your today's tasks...."
         onChangeText={changeHandler}
         value={text}
       />
       <Button
-        title="Add"
+        title="Add Task"
         onPress={submitHandler}
         color={theme === "dark" ? "#007bff" : "#007bff"}
       />
@@ -112,7 +127,7 @@ export default function HomeScreen() {
         data={tasks}
         renderItem={renderItem}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -120,10 +135,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    alignItems: "center",
   },
-  title: {
+  logo: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+  },
+  welcomeText: {
     fontSize: 24,
     fontWeight: "bold",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
     marginBottom: 20,
   },
   input: {
@@ -133,21 +158,19 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 20,
     paddingHorizontal: 10,
+    width: "100%",
   },
-  addTask: {
-    padding: 20,
-    borderRadius: 10,
+  taskItem: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    padding: 20,
+    borderRadius: 10,
     marginBottom: 20,
-    margin: 10,
+    width: "100%",
   },
   deletingTask: {
     backgroundColor: "#9FD4A3",
-  },
-  taskText: {
-    fontSize: 16,
   },
   itemLeft: {
     flexDirection: "row",
@@ -159,7 +182,9 @@ const styles = StyleSheet.create({
     height: 12,
     borderWidth: 2,
     borderRadius: 5,
-    padding: 5,
     marginRight: 10,
+  },
+  taskText: {
+    fontSize: 20,
   },
 });

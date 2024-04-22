@@ -14,7 +14,7 @@ const CalendarScreen = () => {
 
   const months = [
     { name: "January", days: 31 },
-    { name: "February", days: 28 }, // Adjust for leap years
+    { name: "February", days: 29 }, // Adjust for leap years
     { name: "March", days: 31 },
     { name: "April", days: 30 },
     { name: "May", days: 31 },
@@ -71,7 +71,27 @@ const CalendarScreen = () => {
 
   const currentMonth = months[selectedMonthIndex];
 
-  const styles = StyleSheet.create({
+  const {
+    taskList,
+    container,
+    calendarWrapper,
+    calendarContainer,
+    header,
+    monthText,
+    calendar,
+    dateButton,
+    selectedDate: selectedDateStyle,
+    dateText,
+    taskInputContainer,
+    taskInput,
+    addButton,
+    addButtonText,
+    taskListWrapper,
+    taskListTitle,
+    taskItem,
+    taskText: taskTextStyle,
+    deleteButton,
+  } = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme === "dark" ? "#333" : "#fff", // Apply theme-based background color
@@ -127,6 +147,7 @@ const CalendarScreen = () => {
       marginBottom: 10,
     },
     taskInput: {
+      fontSize: 20,
       flex: 1,
       borderWidth: 1,
       borderColor: theme === "dark" ? "#555" : "#ccc", // Apply theme-based border color
@@ -145,23 +166,31 @@ const CalendarScreen = () => {
       color: theme === "dark" ? "#fff" : "#fff", // Apply theme-based text color
       fontWeight: "bold",
     },
-    taskList: {
+    taskListWrapper: {
       paddingHorizontal: 20,
+      marginBottom: 20, // Add margin bottom to separate from the next section
+      backgroundColor: theme === "dark" ? "#444" : "#fff", // Apply theme-based background color
+      borderRadius: 10, // Add borderRadius to create a box-like appearance
+      overflow: "hidden", // Hide overflowing content
     },
     taskListTitle: {
       fontSize: 18,
       fontWeight: "bold",
       marginBottom: 10,
       color: theme === "dark" ? "#fff" : "#000", // Apply theme-based text color
+      padding: 10,
+      backgroundColor: theme === "dark" ? "#222" : "#55a7f0", // Apply theme-based background color
     },
     taskItem: {
+      fontSize: 20,
       flexDirection: "row",
       alignItems: "center",
       marginBottom: 10,
+      paddingHorizontal: 10,
     },
-    taskText: {
+    taskTextStyle: {
       flex: 1,
-      fontSize: 16,
+      fontSize: 25,
       fontStyle: "italic",
       color: theme === "dark" ? "#fff" : "#55a7f0", // Apply theme-based text color
     },
@@ -169,10 +198,10 @@ const CalendarScreen = () => {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.calendarWrapper}>
-        <View style={styles.calendarContainer}>
-          <View style={styles.header}>
+    <View style={container}>
+      <View style={calendarWrapper}>
+        <View style={calendarContainer}>
+          <View style={header}>
             <TouchableOpacity onPress={() => changeMonth(-1)}>
               <AntDesign
                 name="left"
@@ -180,7 +209,7 @@ const CalendarScreen = () => {
                 color={theme === "dark" ? "#fff" : "#fff"}
               />
             </TouchableOpacity>
-            <Text style={styles.monthText}>
+            <Text style={monthText}>
               {currentMonth.name} {selectedYear}
             </Text>
             <TouchableOpacity onPress={() => changeMonth(1)}>
@@ -191,19 +220,19 @@ const CalendarScreen = () => {
               />
             </TouchableOpacity>
           </View>
-          <View style={styles.calendar}>
+          <View style={calendar}>
             {[...Array(currentMonth.days)].map((_, index) => {
               const date = index + 1;
               return (
                 <TouchableOpacity
                   key={date}
                   style={[
-                    styles.dateButton,
-                    date === selectedDate ? styles.selectedDate : null,
+                    dateButton,
+                    date === selectedDate ? selectedDateStyle : null,
                   ]}
                   onPress={() => handleDatePress(date)}
                 >
-                  <Text style={styles.dateText}>{date}</Text>
+                  <Text style={dateText}>{date}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -211,31 +240,33 @@ const CalendarScreen = () => {
         </View>
       </View>
       {selectedDate && (
-        <View style={styles.taskInputContainer}>
+        <View style={taskInputContainer}>
           <TextInput
-            style={styles.taskInput}
+            style={taskInput}
             value={taskText}
             onChangeText={setTaskText}
             placeholder="Enter task"
           />
-          <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
-            <Text style={styles.addButtonText}>Add Task</Text>
+          <TouchableOpacity style={addButton} onPress={handleAddTask}>
+            <Text style={addButtonText}>Add Task</Text>
           </TouchableOpacity>
         </View>
       )}
-      <View style={styles.taskList}>
-        <Text style={styles.taskListTitle}>Select a date to enter tasks:</Text>
-        {tasks.map((task) => (
-          <View key={task.id} style={styles.taskItem}>
-            <Text style={styles.taskText}>⬛️ {task.task}</Text>
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeleteTask(task.id)}
-            >
-              <AntDesign name="delete" size={24} color="red" />
-            </TouchableOpacity>
-          </View>
-        ))}
+      <View style={taskListWrapper}>
+        <Text style={taskListTitle}>Select a date to enter tasks:</Text>
+        <View style={taskList}>
+          {tasks.map((task) => (
+            <View key={task.id} style={taskItem}>
+              <Text style={taskTextStyle}>⬛️ {task.task}</Text>
+              <TouchableOpacity
+                style={deleteButton}
+                onPress={() => handleDeleteTask(task.id)}
+              >
+                <AntDesign name="delete" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );

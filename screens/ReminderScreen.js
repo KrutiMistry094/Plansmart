@@ -57,21 +57,12 @@ const ReminderScreen = () => {
       alert("Please select a future date for the reminder.");
       return;
     }
-
-    PushNotification.localNotificationSchedule({
-      title: "Reminder",
-      message: reminder.text,
-      date: new Date(fireDate),
-      channelId: "reminders",
-      userInfo: { id: reminder.id },
-    });
   };
 
   const handleDeleteReminder = (id) => {
     setReminders((prevReminders) =>
       prevReminders.filter((reminder) => reminder.id !== id)
     );
-    PushNotification.cancelLocalNotifications({ id: id.toString() });
   };
 
   return (
@@ -97,13 +88,13 @@ const ReminderScreen = () => {
       <View
         style={[
           styles.horizontalRule,
-          { color: theme === "dark" ? "#FFF" : "#333" },
+          { borderBottomColor: theme === "dark" ? "#FFF" : "#000" },
         ]}
       />
       <View
         style={[
           styles.reminderForm,
-          { color: theme === "dark" ? "#FFF" : "#333" },
+          { backgroundColor: theme === "dark" ? "#444" : "#FFF" },
         ]}
       >
         <Text
@@ -114,14 +105,14 @@ const ReminderScreen = () => {
         <View
           style={[
             styles.horizontalRule,
-            { color: theme === "dark" ? "#FFF" : "#333" },
+            { borderBottomColor: theme === "dark" ? "#FFF" : "#000" },
           ]}
         />
         <TextInput
           style={[
             styles.input,
             {
-              backgroundColor: theme === "dark" ? "#444" : "#EEE",
+              backgroundColor: theme === "dark" ? "#555" : "#EEE",
               color: theme === "dark" ? "#FFF" : "#333",
             },
           ]}
@@ -130,7 +121,9 @@ const ReminderScreen = () => {
           placeholder="Add a new reminder..."
         />
         <TouchableOpacity style={styles.input} onPress={showDatePicker}>
-          <Text>{selectedDate ? selectedDate : "Select deadline..."}</Text>
+          <Text style={{ color: theme === "dark" ? "black" : "#333" }}>
+            {selectedDate ? selectedDate : "Select deadline..."}
+          </Text>
         </TouchableOpacity>
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
@@ -142,7 +135,7 @@ const ReminderScreen = () => {
           style={[
             styles.input,
             {
-              backgroundColor: theme === "dark" ? "#444" : "#EEE",
+              backgroundColor: theme === "dark" ? "#555" : "#EEE",
               color: theme === "dark" ? "#FFF" : "#333",
             },
             { marginBottom: 10 },
@@ -175,7 +168,12 @@ const ReminderScreen = () => {
         data={reminders}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.reminderItem}>
+          <View
+            style={[
+              styles.reminderItem,
+              { backgroundColor: theme === "dark" ? "#444" : "#FFF" },
+            ]}
+          >
             <View style={styles.reminderInfo}>
               <Text
                 style={[
